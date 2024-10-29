@@ -22,8 +22,7 @@ end
 
 
 get("/payment/new") do
-
-  erb(:payment)
+  erb(:payment_new)
 end
 
 
@@ -53,17 +52,15 @@ get("/random/results") do
 end
 
 
+
 get("/payment/results") do
-  
-  @apr = params.fetch("user_apr").to_f
-  @years = params.fetch("user_years").to_i
-  @pv = params.fetch("user_pv").to_i
-
-
-  @numerator = ((@apr/100)/12) * @pv
-
-  @denominator = 1 - (1 + (@apr/100)/12) **(-@years*12)
-
-  @four_result = @numerator/@denominator
-  erb(:payment_result)
+  r = params.fetch("user_apr").to_f / 100 / 12
+  @p_apr = params.fetch("user_apr").to_f.to_fs(:percentage, { :precision => 4 } )
+  @p_years = params.fetch("user_years").to_i
+  n = @p_years * 12
+  pv = params.fetch("user_pv").to_f
+  @p_principal = pv.to_fs(:currency)
+  p = (r * pv) / (1 - ((1 + r) ** (-n)))
+  @p_result = p.to_fs(:currency)
+  erb(:payment_results)
 end
